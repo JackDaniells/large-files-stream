@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+
+# VSCode files
+.idea
+
+*.DS_Store
