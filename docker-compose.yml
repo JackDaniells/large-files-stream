@@ -22,6 +22,24 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 200M
+          memory: 100M
     depends_on:
       - redis
+
+  client-api:
+    build:
+      context: .
+      dockerfile: client-api/Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      - GRPC_SERVER_NAME=server
+      - GRPC_PORT=50051
+      - API_PORT=8000
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 100M
+    depends_on:
+      - server
