@@ -7,13 +7,15 @@ services:
     ports:
       - '6379:6379'
     command: redis-server
+    networks:
+      - intranet
 
   server:
     build:
       context: .
       dockerfile: server/Dockerfile
     ports:
-      - 3000:3000
+      - '3000:3000'
     environment:
       - GRPC_PORT=50051
       - REDIS_HOST=redis
@@ -23,6 +25,8 @@ services:
         limits:
           cpus: '1'
           memory: 100M
+    networks:
+      - intranet
     depends_on:
       - redis
 
@@ -31,7 +35,7 @@ services:
       context: .
       dockerfile: client-api/Dockerfile
     ports:
-      - 8000:8000
+      - '8000:8000'
     environment:
       - GRPC_SERVER_NAME=server
       - GRPC_PORT=50051
@@ -41,5 +45,16 @@ services:
         limits:
           cpus: '1'
           memory: 100M
+    networks:
+      - intranet
+      - extranet
     depends_on:
       - server
+
+networks:
+  intranet:
+    name: intranet-netwotk
+    internal: true
+  extranet:
+    name: extranet-network
+
