@@ -3,9 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/JackDaniells/port-service/client-api/domain/contracts"
-	"github.com/JackDaniells/port-service/client-api/domain/handlers/request"
 	"github.com/gorilla/mux"
-	"io"
 	"log"
 	"net/http"
 )
@@ -51,16 +49,8 @@ func (s *portHandler) GetFileByID(response http.ResponseWriter, request *http.Re
 func (s *portHandler) UploadPortFileHandler(response http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
-	ports, err := s.decodeFile(request.Body)
+	createResponse, err := s.portService.UploadPortFile(ctx, request.Body)
 	if err != nil {
-		log.Println("error to decode file: ", err)
-		response.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	createResponse, err := s.portService.StreamCreate(ctx, ports)
-	if err != nil {
-		log.Println("error when streaming ports: ", err)
 		response.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -80,17 +70,4 @@ func (s *portHandler) UploadPortFileHandler(response http.ResponseWriter, reques
 		return
 	}
 	response.WriteHeader(http.StatusCreated)
-}
-
-func (s *portHandler) decodeFile(fileStream io.ReadCloser) (request.UploadPortByFileRequest, error) {
-	dec := json.NewDecoder(fileStream)
-	var ports request.UploadPortByFileRequest
-	for {
-		if err := dec.Decode(&ports); err == io.EOF {
-			break
-		} else if err != nil {
-			return nil, err
-		}
-	}
-	return ports, nil
 }
