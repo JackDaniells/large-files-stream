@@ -15,24 +15,19 @@ type CreatePortRequest struct {
 	Code        string    `json:"code"`
 }
 
-type UploadPortByFileRequest map[string]CreatePortRequest
-
-func ParseUploadPortRequestToProtoPortArray(portsJson UploadPortByFileRequest) (ports []*proto.Port) {
-	for key, portJson := range portsJson {
-		port := &proto.Port{
-			Id:          key,
-			Name:        portJson.Name,
-			City:        portJson.City,
-			Province:    portJson.Province,
-			Country:     portJson.Country,
-			Alias:       portJson.Alias,
-			Regions:     portJson.Regions,
-			Coordinates: portJson.Coordinates,
-			Timezone:    portJson.Timezone,
-			Unlocs:      portJson.Unlocs,
-			Code:        portJson.Code,
-		}
-		ports = append(ports, port)
+func ParseUploadPortRequestToProtoPortArray(key string, portJson *CreatePortRequest) (ports *proto.Port) {
+	return &proto.Port{
+		Id:          key,
+		Name:        portJson.Name,
+		City:        portJson.City,
+		Province:    portJson.Province,
+		Country:     portJson.Country,
+		Alias:       portJson.Alias,
+		Regions:     portJson.Regions,
+		Coordinates: portJson.Coordinates,
+		Timezone:    portJson.Timezone,
+		Unlocs:      portJson.Unlocs,
+		Code:        portJson.Code,
 	}
-	return
+
 }
