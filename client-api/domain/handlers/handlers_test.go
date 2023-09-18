@@ -109,13 +109,13 @@ func TestServer_decodeFile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &portHandler{}
-			got, err := h.decodeFile(tt.args.fileStream)
+			got, err := h.sendFiles(tt.args.fileStream)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("decodeFile() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("sendFiles() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("decodeFile() got = %v, want %v", got, tt.want)
+				t.Errorf("sendFiles() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
