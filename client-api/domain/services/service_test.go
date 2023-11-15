@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/JackDaniells/port-service/client-api/domain/contracts"
 	"github.com/JackDaniells/port-service/client-api/domain/contracts/mocks"
-	"github.com/JackDaniells/port-service/client-api/domain/handlers/request"
 	"github.com/JackDaniells/port-service/client-api/domain/handlers/response"
 	proto "github.com/JackDaniells/port-service/proto"
 	"reflect"
@@ -76,87 +75,6 @@ func Test_portService_FindByID(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FindByID() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_portService_StreamCreate(t *testing.T) {
-	type fields struct {
-		grpcClient contracts.PortServiceClient
-	}
-	type args struct {
-		ctx   context.Context
-		ports request.UploadPortByFileRequest
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *response.UploadPortByFileResponse
-		wantErr bool
-	}{
-		{
-			name: "Should create ports with success",
-			fields: fields{
-				grpcClient: func() contracts.PortServiceClient {
-					client := &mocks.PortServiceClient{}
-					client.On("StreamCreate", context.Background(), []*proto.Port{
-						{Id: "PORT", Name: "Port"},
-					}).Return(&proto.CreateResponse{Total: 1}, nil)
-
-					return client
-				}(),
-			},
-			args: args{
-				ctx: context.Background(),
-				ports: request.UploadPortByFileRequest{
-					"PORT": request.CreatePortRequest{
-						Name: "Port",
-					},
-				},
-			},
-			want: &response.UploadPortByFileResponse{
-				Total: 1,
-			},
-			wantErr: false,
-		},
-		{
-			name: "Should return error when grpc client return error",
-			fields: fields{
-				grpcClient: func() contracts.PortServiceClient {
-					client := &mocks.PortServiceClient{}
-					client.On("StreamCreate", context.Background(), []*proto.Port{
-						{Id: "PORT", Name: "Port"},
-					}).Return(nil, errors.New("error"))
-
-					return client
-				}(),
-			},
-			args: args{
-				ctx: context.Background(),
-				ports: request.UploadPortByFileRequest{
-					"PORT": request.CreatePortRequest{
-						Name: "Port",
-					},
-				},
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &portService{
-				grpcClient: tt.fields.grpcClient,
-			}
-
-			got, err := p.StreamCreate(tt.args.ctx, tt.args.ports)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("StreamCreate() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("StreamCreate() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

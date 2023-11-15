@@ -32,25 +32,14 @@ func (p PortServiceClient) FindByID(ctx context.Context, id string) (*proto.Port
 	return response, nil
 }
 
-func (p PortServiceClient) StreamCreate(ctx context.Context, ports []*proto.Port) (*proto.CreateResponse, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+func (p PortServiceClient) StreamCreate(ctx context.Context) (proto.PortService_CreateClient, error) {
+	return p.client.Create(ctx)
+}
 
-	stream, err := p.client.Create(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("create stream: %w", err)
-	}
+func (p PortServiceClient) StreamSendPortFile(stream proto.PortService_CreateClient, port *proto.Port) error {
+	return stream.Send(port)
+}
 
-	for _, port := range ports {
-		if err := stream.Send(port); err != nil {
-			return nil, fmt.Errorf("send stream: %w", err)
-		}
-	}
-
-	response, err := stream.CloseAndRecv()
-	if err != nil {
-		return nil, fmt.Errorf("close and receive: %w", err)
-	}
-
-	return response, nil
+func (p PortServiceClient) StreamClose(stream proto.PortService_CreateClient) (*proto.CreateResponse, error) {
+	return stream.CloseAndRecv()
 }
